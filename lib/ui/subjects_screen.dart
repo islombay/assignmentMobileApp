@@ -1,3 +1,4 @@
+import 'package:assignment_app/ui/records_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:assignment_app/data/app_repository.dart';
@@ -17,74 +18,75 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(
-        child: Text(
-          "Quiz Apper",
-            style: GoogleFonts.montserrat(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            color: AppColors.blue,
-        )),
-      ),
+      appBar: AppBar(
+        title: Center(
+          child: Text("Quiz Apper",
+              style: GoogleFonts.montserrat(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+                color: AppColors.blue,
+              )),
+        ),
         elevation: 0,
       ),
       body: ListView(
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 10.0),
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            decoration: BoxDecoration(
-              color: AppColors.cyan
-            ),
-            child: Center(
-              child: Text(
-                "Quiz it!",
+              margin: const EdgeInsets.symmetric(vertical: 10.0),
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              decoration: BoxDecoration(color: AppColors.cyan),
+              child: Center(
+                  child: Text("Quiz it!",
+                      style: GoogleFonts.montserrat(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.blue,
+                      )))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Records",
+                            style: GoogleFonts.montserrat(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.blue,
+                            )),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return RecordsScreen(subjects: AppRepository.subjects);
+                                },
+                              )
+                            );
+                          },
+                            child: Container(
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    color: AppColors.pink,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0))),
+                                child: Icon(
+                                  Icons.arrow_forward,
+                                  color: AppColors.blue,
+                                )))
+                      ]),
+                ]),
+          ),
+          Center(
+            child: Text("Subjects",
                 style: GoogleFonts.montserrat(
                   fontSize: 22,
                   fontWeight: FontWeight.w400,
                   color: AppColors.blue,
-                )
-              )
-            )
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:[
-                    Text(
-                      "Records",
-                        style: GoogleFonts.montserrat(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.blue,
-                        )
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.pink,
-                        borderRadius: BorderRadius.all(Radius.circular(10.0))
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: AppColors.blue,
-                      )
-                    )
-                  ]
-                ),
-                  ]
-            ),
-          ),
-          Center(
-            child: Text("Subjects", style: GoogleFonts.montserrat(
-              fontSize:22,
-              fontWeight: FontWeight.w400,
-              color: AppColors.blue,
-            )),
+                )),
           ),
           for (int index = 0; index < AppRepository.subjects.length; index++)
             SubjectItemView(

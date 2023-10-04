@@ -7,44 +7,50 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/colors.dart';
 
 
-class ResultsScreen extends StatelessWidget {
+class ResultsScreen extends StatefulWidget {
   ResultsScreen(
       {super.key,
-      required this.questions,
-      required this.selectedAnswers,
-      required this.subjectName,
-      required this.seconds});
+        required this.questions,
+        required this.selectedAnswers,
+        required this.subjectName,
+        required this.seconds});
 
   final List<QuestionModel> questions;
   final Map<int, int> selectedAnswers;
   final String subjectName;
   final int seconds;
 
-  // math_ball = 34%
-  // math_time = 23424 secs
+  late int max_time = 0;
+  late double max_per = 0;
+
+  @override
+  State<ResultsScreen> createState() => _ResultsScreenState();
+}
+
+class _ResultsScreenState extends State<ResultsScreen> {
 
   Future<void> setValue(double percentageOfCorrectAnswer, int timeSpendSeconds) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setDouble("${subjectName}_ball", percentageOfCorrectAnswer); // math_ball = double for percentage
-    preferences.setInt("${subjectName}_time", timeSpendSeconds);
+    preferences.setDouble("${widget.subjectName}_ball", percentageOfCorrectAnswer); // math_ball = double for percentage
+    preferences.setInt("${widget.subjectName}_time", timeSpendSeconds);
   }
 
   Future<double?> getBall() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    double? correctPercentage = preferences.getDouble("${subjectName}_ball");
+    double? correctPercentage = preferences.getDouble("${widget.subjectName}_ball");
     return correctPercentage;
   }
 
   Future<int?> getTime() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    int? timeSpend = preferences.getInt("${subjectName}_time");
+    int? timeSpend = preferences.getInt("${widget.subjectName}_time");
     return timeSpend;
   }
 
   int calculateTrueAnswersCount() {
     int trueCount = 0;
-    for (int i = 0; i < questions.length; i++) {
-      if (questions[i].trueAnswer == selectedAnswers[i]) {
+    for (int i = 0; i < widget.questions.length; i++) {
+      if (widget.questions[i].trueAnswer == widget.selectedAnswers[i]) {
         trueCount++;
       }
     }
@@ -61,46 +67,41 @@ class ResultsScreen extends StatelessWidget {
     return '$minutesStr:$secondsStr';
   }
 
-  // int max_time = 0;
-  // double max_percentage = 0;
-
-
   @override
   Widget build(BuildContext context) {
-    double percentage = (100 * calculateTrueAnswersCount()) / questions.length;
-    double max_per = 0;
-    int max_time = -1;
+    double percentage = (100 * calculateTrueAnswersCount()) / widget.questions.length;
+    // double max_per = 0;
+    // int max_time = -1;
 
     Future<void> checkAndSetRecord() async {
       bool isRecord = false;
-      if (percentage >= max_per && percentage != 0) {
-        if ((seconds <= max_time && max_time != -1) || max_time == -1) {
-            isRecord = true;
+      // if (percentage >= widget.max_per && percentage != 0) {
+      //   if ((widget.seconds <= widget.max_time && widget.max_time != -1) || widget.max_time == -1) {
+      //     isRecord = true;
+      //   }
+      // }
+      if (percentage != 0){
+        if (widget.max_time == 0 || (percentage == widget.max_per && widget.seconds <= widget.max_time)){
+          isRecord = true;
+        } else if (percentage > widget.max_per) {
+          isRecord = true;
         }
       }
       if (isRecord){
-        await setValue(percentage, seconds);
+        await setValue(percentage, widget.seconds);
       }
-
-      print(percentage);
-      print(max_per);
-      print(max_time);
-      print(seconds);
-      print(isRecord);
+      setState((){});
     }
 
     Future<void> fetchData() async {
       int? value_time = await getTime();
       if (value_time != null){
-        max_time = value_time;
+        widget.max_time = value_time;
       }
       double? value_per = await getBall();
-      print(value_per);
-      print("---------");
       if (value_per != null) {
-        max_per = value_per;
+        widget.max_per = value_per;
       }
-
       await checkAndSetRecord();
     }
     fetchData();
@@ -119,7 +120,6 @@ class ResultsScreen extends StatelessWidget {
       resColor = AppColors.cyan;
       resText = "Great!";
     }
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -170,7 +170,7 @@ class ResultsScreen extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       color: AppColors.blue,
                     )),
-                Text(formatTime(seconds),
+                Text(formatTime(widget.seconds),
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -184,7 +184,7 @@ class ResultsScreen extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       color: AppColors.blue,
                     )),
-                Text("${max_per}%",
+                Text("${widget.max_per}%",
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -212,7 +212,7 @@ class ResultsScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.cyan,
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                                BorderRadius.all(Radius.circular(15)),
                               ),
                               child: Center(
                                   child: Text("Menu",
